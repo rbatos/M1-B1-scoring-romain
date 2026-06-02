@@ -6,6 +6,11 @@ Build a scikit-learn Pipeline + ColumnTransformer that handles:
 - Target: binary mapping
 
 This module is imported by `train.py` and `evaluate.py`.
+
+---
+
+Objectif: construire un préprocesseur réutilisable (scikit-learn ColumnTransformer)
+pour numeric/categorical et charger le dataset.
 """
 from __future__ import annotations
 
@@ -17,14 +22,29 @@ from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 
-# TODO — fill these lists from your EDA
+# liste des colonnes numériques
 NUMERIC_FEATURES: list[str] = [
-    # e.g. "loan_amnt", "int_rate", "annual_inc", ...
+    "loan_amnt",
+    "int_rate",
+    "installment",
+    "annual_inc",
+    "dti",
+    "delinq_2yrs",
+    "fico_range_low",
+    "revol_util",
 ]
+# liste des colonnes catégorielles
 CATEGORICAL_FEATURES: list[str] = [
-    # e.g. "term", "grade", "home_ownership", "purpose", ...
+    "term",
+    "grade",
+    "home_ownership",
+    "verification_status",
+    "purpose",
+    "emp_length",
 ]
+# nom de la colonne cible ("loan_status").
 TARGET_COLUMN: str = "loan_status"
+# mapping de la cible en binaire (0/1).
 TARGET_MAPPING: dict[str, int] = {"Fully Paid": 0, "Charged Off": 1}
 
 
@@ -36,6 +56,12 @@ def load_dataset(path: Path) -> tuple[pd.DataFrame, pd.Series]:
 
     Returns:
         (X, y) where X is the feature DataFrame and y the target Series.
+
+    ---
+
+    Lit le CSV (pd.read_csv(path)),
+    mappe la colonne cible via TARGET_MAPPING,
+    retourne X (DataFrame sans la colonne cible) et y (Series binaire).
     """
     df = pd.read_csv(path)
     y = df[TARGET_COLUMN].map(TARGET_MAPPING)
@@ -45,6 +71,7 @@ def load_dataset(path: Path) -> tuple[pd.DataFrame, pd.Series]:
 
 def build_preprocessor() -> ColumnTransformer:
     """Build the ColumnTransformer applying numeric + categorical pipelines."""
+    # Vérifie que NUMERIC_FEATURES et CATEGORICAL_FEATURES ne sont pas vides (lève ValueError sinon).
     if not NUMERIC_FEATURES or not CATEGORICAL_FEATURES:
         raise ValueError(
             "NUMERIC_FEATURES and CATEGORICAL_FEATURES are empty in "
@@ -63,6 +90,7 @@ def build_preprocessor() -> ColumnTransformer:
             ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
         ]
     )
+    # Retourne un ColumnTransformer qui applique ces pipelines et droppe le reste.
     return ColumnTransformer(
         transformers=[
             ("num", numeric_pipeline, NUMERIC_FEATURES),

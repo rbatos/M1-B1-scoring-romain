@@ -5,47 +5,41 @@
 
 ## Contexte
 
-(En une phrase : pourquoi ce travail, qu'est-ce qui était attendu.)
+L'objectif était de produire une version v2 du scoring crédit capable de mieux détecter les défauts que la baseline Pyrenex-risk-v1, tout en conservant une performance globale raisonnable.
 
 ## Démarche
 
-(En 2-3 phrases : dataset utilisé, split, nombre de configurations testées,
-critères d'évaluation.)
+Nous avons entraîné et comparé plusieurs configurations de `RandomForestClassifier` sur `data/lending_club_train.csv` avec un split stratifié `test_size=0.2`, `random_state=42`. Trois séries d'expériences ont été documentées : modèle par défaut, modèle balanced, puis cinq variantes `balanced_*` évaluées sur test interne et une sélection finale validée sur le holdout.
 
 ## Verdict chiffré
 
 | Métrique | Baseline 2017 (Pyrenex-risk-v1) | Modèle retenu (v2) | Variation |
 |---|---|---|---|
-| F1 macro (holdout) | … | … | … |
-| F1 défaut | … | … | … |
-| ROC-AUC | … | … | … |
-| Recall défaut | … | … | … |
+| Accuracy | 0.8492 | 0.7137 | -0.1355 |
+| F1 macro | 0.5018 | 0.6162 | +0.1144 |
+| F1 défaut | 0.1269* | 0.4227 | +0.2958 |
+| ROC-AUC | 0.7296 | 0.7338 | +0.0042 |
+| Recall défaut | ~0.0462 | 0.5703 | +0.5241 |
 
-**Configuration retenue** : (rappel des hyperparamètres principaux)
+*Baseline F1 défaut estimée sur la matrice `[[2021, 11], [351, 17]]`.
+
+**Configuration retenue** : `balanced_recall` — `n_estimators=250`, `max_depth=12`, `min_samples_leaf=5`, `class_weight='balanced_subsample'`, `max_features='sqrt'`, `random_state=42`, `n_jobs=-1`.
 
 ## Trade-off explicité au métier
 
-(2-3 phrases : qu'est-ce que le client gagne ? qu'est-ce qu'il perd ?
-Par exemple : *« le rappel défaut passe de 14% à 61% — soit 4× plus de
-mauvais payeurs détectés — au prix d'une précision défaut qui passe de
-38% à 41%. En clair : pour rattraper plus de défauts, le modèle déclenche
-davantage de fausses alertes. »*)
+Le modèle retenu augmente fortement la détection des défauts : le recall défaut passe de ~4,6 % à 57,0 %. Le prix à payer est une baisse d'accuracy globale (-13,5 points) et une précision défaut modérée (33,6 %), ce qui signifie plus d'alertes erronées, mais une couverture bien supérieure des prêts à risque.
 
 ## Précautions avant mise en production
 
-- Vérifier que le **schéma d'entrée** en production correspond exactement
-  au schéma d'entraînement (cf. `pyrenex_risk_v2.json` → `feature_columns`)
-- Re-évaluer le **seuil de décision** (0.5 par défaut) avec l'équipe
-  métier — un seuil 0.3 peut être plus adapté selon l'appétence au risque
-- Mettre en place un **monitoring** dès le déploiement (cf. M5/M6)
-- Surveiller les **variables sensibles** identifiées (FICO, état US,
-  revenu) — risque de disparate impact à auditer (M2/M7)
+- Vérifier que le schéma d'entrée en production est identique au schéma d'entraînement (`feature_columns` dans `pyrenex_risk_v2.json`).
+- Recalibrer le seuil de décision avec l'équipe métier ; 0.5 est le point de départ, mais un seuil plus bas peut augmenter encore le recall si le business l'autorise.
+- Mettre en place un monitoring de dérive des données et des métriques après déploiement.
+- Auditer le risque de biais sur les variables sensibles (FICO, revenu, statut de résidence) avant passage en production.
 
 ## Recommandation
 
-✅ **Remplacer Pyrenex-risk-v1** par v2 *OU* ⛔ **Ne pas remplacer** —
-choisis et justifie en une phrase.
+✅ **Remplacer Pyrenex-risk-v1 par Pyrenex-risk-v2** pour cette version, car elle améliore nettement la F1 macro et le rappel des défauts tout en conservant une discrimination au moins équivalente.
 
 ---
 
-*Signé : <prenom> <nom>, FastIA, le YYYY-MM-DD*
+*Signé : Romain Busuttil, le 2026-06-02*
