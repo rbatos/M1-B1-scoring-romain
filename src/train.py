@@ -144,8 +144,7 @@ def train(config_name: str, data_path: Path, output_dir: Path) -> dict:
 
     # Charge les données via load_dataset(data_path) (importé depuis preprocess.py)
     X, y = load_dataset(data_path)
-    # Sépare en train/test (test_size=0.2, stratify=y, random_state=42).
-    # todo début vidéo 7 à priori
+    # Sépare en train 80% / test 20% (test_size=0.2, stratify=y => conserve la même proportion de classes dans train et test, random_state=42 => fige le tirage aléatoire → reproductibilité).
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.2, stratify=y, random_state=42
     )
@@ -163,6 +162,9 @@ def train(config_name: str, data_path: Path, output_dir: Path) -> dict:
     pipeline.fit(X_train, y_train)
 
     # Calcule probabilités et métriques sur le test interne.
+    # Attention `model.predict()` applique implicitement un seuil de 0.5 sur la probabilité.
+    # **Ce seuil n'est pas optimal** en déséquilibre. Pour Pyrenex, baisser le seuil à 0.3 peut faire chuter la précision mais explose le recall sur les défauts — souvent ce que le métier veut.
+    # TODO reste à faire de jour avec le seuil : (model.predict_proba(X_test)[:, 1] > 0.3).astype(int). Recompute la matrice de confusion. Qu'est-ce qui bouge ?
     y_pred = pipeline.predict(X_test)
     y_proba = pipeline.predict_proba(X_test)[:, 1]
     cm = confusion_matrix(y_test, y_pred)

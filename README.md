@@ -134,3 +134,53 @@ Mini-cours d'appui : voir [`./ressources/`](./ressources/).
 3. Compare tes métriques à celles de la baseline `pyrenex-risk-v1` —
    un écart > 50% absolu = relire ton preprocessing.
 4. Demande en direct mardi.
+
+---
+
+## 🔁 Mise à jour — travail effectué
+
+- Entraînement et évaluation du pipeline `pyrenex_risk_v2` dans `src/train.py` et
+   génération des artefacts dans `models/` (`.joblib` + `.json`).
+- Notebook `notebooks/M1-B1_romain_scoring.ipynb` : EDA, préparation, tests de
+   stabilité et évaluation sur `holdout`.
+
+## ▶️ Commande pour reproduire
+
+Exécuter l'entraînement (exemples de configs disponibles via `--config`):
+
+```
+python src/train.py --config default --data data/lending_club_train.csv --output models/
+python src/train.py --config balanced --data data/lending_club_train.csv --output models/
+```
+
+ou pour lancer toutes les configurations définies :
+
+```
+python src/train.py --config all
+```
+
+Evaluation finale sur le holdout
+
+```
+cp models/pyrenex_risk_v2_balanced_recall.joblib models/pyrenex_risk_v2.joblib
+cp models/pyrenex_risk_v2_balanced_recall.json models/pyrenex_risk_v2.json
+python src/evaluate.py --update-meta
+```
+
+## 📏 Métriques retenues
+
+- F1 macro (moyenne non pondérée des F1 par classe)
+- F1 pour la classe défaut (classe `1`)
+- Precision (pour la classe défaut)
+- Recall (pour la classe défaut)
+- ROC-AUC (probabilités)
+- Matrice de confusion (2×2)
+
+Ces métriques sont calculées à la fois sur le test interne (split) et sur le
+`holdout` final — les valeurs finales reportées dans `models/*.json` sous
+`metrics_holdout`.
+
+## 🗂️ Verdict
+
+Synthèse finale et recommandations : see [verdict.md](verdict.md)
+

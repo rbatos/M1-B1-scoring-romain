@@ -137,6 +137,7 @@
 > **À remplir une seule fois**, à la tâche 5 du brief, **après** avoir choisi
 > ton modèle retenu parmi les `exp_NNN` ci-dessus. Le holdout n'est consulté
 > qu'ici.
+(cp models/pyrenex_risk_v2_balanced_recall.joblib models/pyrenex_risk_v2.joblib + cp models/pyrenex_risk_v2_balanced_recall.joblib models/pyrenex_risk_v2.joblib + cp models/pyrenex_risk_v2_balanced_recall.joblib models/pyrenex_risk_v2.joblib)
 
 - **Date** : 2026-06-02
 - **Expérience retenue** : exp_003 (`balanced_recall`)

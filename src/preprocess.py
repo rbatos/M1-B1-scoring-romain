@@ -63,7 +63,8 @@ def load_dataset(path: Path) -> tuple[pd.DataFrame, pd.Series]:
     mappe la colonne cible via TARGET_MAPPING,
     retourne X (DataFrame sans la colonne cible) et y (Series binaire).
     """
-    df = pd.read_csv(path)
+    df = pd.read_csv(path, dtype={"loan_amnt": "int64", "term": "str", "int_rate": "float64", "installment": "float64", "grade": "str", "emp_length": "str", "home_ownership": "str", "annual_inc": "Int64", "verification_status": "str", "purpose": "str", "dti": "float64", "delinq_2yrs": "Int64", "fico_range_low": "Int64", "revol_util": "float64", "loan_status": "str"})
+    #5700,36 months,6.71,175.24,A,3 years,MORTGAGE,38900,Not Verified,small_business,17.92,0,738,78.1,Fully Paid
     y = df[TARGET_COLUMN].map(TARGET_MAPPING)
     X = df.drop(columns=[TARGET_COLUMN])
     return X, y

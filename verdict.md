@@ -9,7 +9,7 @@ L'objectif était de produire une version v2 du scoring crédit capable de mieux
 
 ## Démarche
 
-Nous avons entraîné et comparé plusieurs configurations de `RandomForestClassifier` sur `data/lending_club_train.csv` avec un split stratifié `test_size=0.2`, `random_state=42`. Trois séries d'expériences ont été documentées : modèle par défaut, modèle balanced, puis cinq variantes `balanced_*` évaluées sur test interne et une sélection finale validée sur le holdout.
+Nous avons entraîné et comparé plusieurs configurations de `RandomForestClassifier` sur `data/lending_club_train.csv` avec un split stratifié `test_size=0.2`, `stratify=y`, `random_state=42`. Trois séries d'expériences ont été documentées : modèle par défaut, modèle balanced, puis cinq variantes `balanced_*` évaluées sur test interne et une sélection finale validée sur le holdout.
 
 ## Verdict chiffré
 
@@ -42,4 +42,4 @@ Le modèle retenu augmente fortement la détection des défauts : le recall déf
 
 ---
 
-*Signé : Romain Busuttil, le 2026-06-02*
+*Signé : Romain Busuttil boosté à l'IA, le 2026-06-02*

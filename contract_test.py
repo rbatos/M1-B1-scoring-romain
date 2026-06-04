@@ -56,7 +56,7 @@ def contract_test_model(
 
 
 if __name__ == "__main__":
-    # 1. Capture la référence proba depuis ton notebook (à coller en cellule) :
+    # 1. Capture la référence proba depuis ton notebook
     #
     #    import joblib, pandas as pd
     #    pipeline = joblib.load("../models/pyrenex_risk_v2.joblib")
@@ -69,7 +69,7 @@ if __name__ == "__main__":
     # ⚠️ Le `.drop(columns=["loan_status"])` est essentiel : le pipeline
     #    attend les features uniquement, pas la cible.
 
-    expected_first_proba: list[float] | None = None  # TODO — colle ici les 2 floats du print
+    expected_first_proba: list[float] | None = [0.7903052440641744, 0.20969475593582512]
 
     if expected_first_proba is None:
         raise NotImplementedError(
